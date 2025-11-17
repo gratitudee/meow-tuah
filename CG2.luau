@@ -1,7 +1,7 @@
 -- Services and Utility
-local Services = loadfile("ESPShit/src/modules/Services.luau")()
-local Utility = loadfile("ESPShit/src/modules/Utility.luau")()
-local UI = loadfile("ESPShit/src/modules/UI.luau")()
+local Services = GetModuleFromRepo("Services.luau")
+local Utility = GetModuleFromRepo("Utility.luau")
+local UI = GetModuleFromRepo("UI.luau")
 
 -- References
 local Workspace = Services.Workspace
