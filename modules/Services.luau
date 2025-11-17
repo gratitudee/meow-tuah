@@ -1,5 +1,4 @@
 -- Service Module
---local utility = require("./Utility.luau")
 local utility = loadfile("ESPShit/src/modules/Utility.luau")()
 local serviceCache = {}
 
@@ -22,3 +21,4 @@ return {
 	TweenService = getService("TweenService") :: TweenService,
 	VirtualInputManager = getService("VirtualInputManager") :: VirtualInputManager,
 }
+
