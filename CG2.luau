@@ -3,6 +3,11 @@ local Services = GetModuleFromRepo("Services.luau")
 local Utility = GetModuleFromRepo("Utility.luau")
 local UI = GetModuleFromRepo("UI.luau")
 
+if not Services or not Utility or not UI then
+	printconsole("Failed to load meow-tuah", Color3.new(1, 0, 0)
+	return
+end
+
 -- References
 local Workspace = Services.Workspace
 local RunService = Services.RunService
@@ -1045,3 +1050,4 @@ UI:Notify({
 	Duration = 3,
 	Icon = "check",
 })
+
