@@ -1,5 +1,5 @@
 -- Service Module
-local utility = loadfile("ESPShit/src/modules/Utility.luau")()
+local utility = GetModuleFromRepo(Utility.luau)
 local serviceCache = {}
 
 local function getService(serviceName: string): Instance
@@ -21,4 +21,5 @@ return {
 	TweenService = getService("TweenService") :: TweenService,
 	VirtualInputManager = getService("VirtualInputManager") :: VirtualInputManager,
 }
+
 
