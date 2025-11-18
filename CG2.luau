@@ -509,17 +509,7 @@ do
 
     function PerfectSlide:DoSlide()
         SendKeyUpKeyDown(Enum.KeyCode.LeftControl, 0.01)
-
-        local timeout = 1.0
-        local startTime = tick()
-
-        repeat
-            task.wait()
-            local replicator = PerfectSlide.Settings.CurrentReplicator
-        until (replicator and replicator:Has('Sliding'))
-            or (tick() - startTime > timeout)
-
-        SendKeyUpKeyDown(Enum.KeyCode.Space, 0.03)
+        SendKeyUpKeyDown(Enum.KeyCode.Space, 0.01)
     end
 
     function PerfectSlide:CanSlide()
@@ -970,5 +960,6 @@ do
     UI:KeybindList()
     getgenv().CG2_SCRIPT_LOADED = true
 end
+
 
 
