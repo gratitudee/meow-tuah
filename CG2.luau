@@ -168,12 +168,14 @@ local function CleanupEverything()
 	TrinketESP._initialized = false
 	TrinketAutograb._initialized = false
 	table.clear(TrinketShared.Trinkets)
+	--[[
 	UI:Notify({
 		Title = "Script Unloaded",
 		Content = "Script Successfully Unloaded!",
 		Duration = 3,
 		Icon = "check",
 	})
+	]]--
 end
 
 local Window = UI:Window({
@@ -1272,3 +1274,4 @@ UI:Notify({
 })
 ]]
 --
+
