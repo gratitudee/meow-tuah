@@ -322,7 +322,6 @@ function AutoParry:OnAttackDetected(player, character, track)
 	end
 
 	self:ExecuteParry()
-	print("execd")
 end
 
 function AutoParry:ExecuteParry()
@@ -334,7 +333,6 @@ function AutoParry:Toggle()
 	if not self.Settings.Enabled then
 		self:ClearTarget()
 	end
-	print(self.Settings.Enabled)
 end
 
 function AutoParry:SetMaxDistance(distance)
@@ -631,7 +629,6 @@ function TrinketShared:Initialise()
 	end
 
 	if not Trinkets then
-		warn("Trinkets folder not found!")
 		return
 	end
 
@@ -954,7 +951,6 @@ local function SettingsTab()
 		Flag = "ScriptDrawingFont",
 		AllowNone = false,
 		Callback = function(option)
-			print(option)
 			MainScript.Font = option
 			TrinketESP:UpdateFontSettings()
 		end,
@@ -1050,5 +1046,6 @@ UI:Notify({
 	Duration = 3,
 	Icon = "check",
 })
+
 
 
