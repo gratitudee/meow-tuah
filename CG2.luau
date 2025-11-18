@@ -967,6 +967,8 @@ do
     TrinketShared:Initialise()
     TrinketESP:Initialise()
     TrinketAutograb:Initialise()
+    UI:KeybindList()
     getgenv().CG2_SCRIPT_LOADED = true
 end
+
 
