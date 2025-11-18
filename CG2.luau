@@ -508,7 +508,7 @@ do
     end)
 
     function PerfectSlide:DoSlide()
-        SendKeyUpKeyDown(Enum.KeyCode.LeftControl, 0.03)
+        SendKeyUpKeyDown(Enum.KeyCode.LeftControl, 0.01)
 
         local timeout = 1.0
         local startTime = tick()
@@ -969,3 +969,4 @@ do
     TrinketAutograb:Initialise()
     getgenv().CG2_SCRIPT_LOADED = true
 end
+
