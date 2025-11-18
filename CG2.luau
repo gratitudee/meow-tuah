@@ -58,10 +58,15 @@ local TrinketESP = {
 		ShowHighlight = false,
 		MaxDistance = 1000,
 		NameColor = Color3.new(1, 1, 1),
+		NameAlpha = 1,
 		DistanceColor = Color3.new(1, 1, 1),
+		DistanceAlpha = 1,
 		ValueColor = Color3.new(1, 1, 1),
+		ValueAlpha = 1,
 		HighlightFillColor = Color3.new(1, 0, 0),
+		HighlightFillAlpha = 1,
 		HighlightOutlineColor = Color3.new(1, 1, 1),
+		HighlightOutlineAlpha = 1,
 	},
 	Drawings = {},
 	Connections = {},
@@ -175,7 +180,8 @@ local function CleanupEverything()
 		Duration = 3,
 		Icon = "check",
 	})
-	]]--
+	]]
+	--
 end
 
 local Window = UI:Window({
@@ -221,7 +227,7 @@ local NameESPToggle, DistanceESPToggle, ValueESPToggle, HighlightESPToggle
 AutoParryToggle = AutoParrySection1:Toggle({
 	Name = "Auto Parry",
 	Flag = "Auto_Parry_Toggle",
-	Default = false,
+	Default = AutoParry.Settings.Enabled,
 	Callback = function(value)
 		AutoParry.Settings.Enabled = value
 	end,
@@ -242,7 +248,7 @@ AutoParrySection1:Slider({
 	Flag = "Auto_Parry_Max_Distance",
 	Min = 1,
 	Max = 20,
-	Default = 10,
+	Default = AutoParry.Settings.MaxDistance,
 	Callback = function(value)
 		AutoParry.Settings.MaxDistance = tonumber(value)
 	end,
@@ -251,7 +257,7 @@ AutoParrySection1:Slider({
 TrinketESPSection:Toggle({
 	Name = "Trinket ESP",
 	Flag = "Trinket_ESP_Toggle",
-	Default = false,
+	Default = TrinketESP.Settings.Enabled,
 	Callback = function(value)
 		TrinketESP.Settings.Enabled = value
 	end,
@@ -260,67 +266,69 @@ TrinketESPSection:Toggle({
 NameESPToggle = TrinketESPSection:Toggle({
 	Name = "Name",
 	Flag = "Trinket_Name_ESP_Toggle",
-	Default = false,
+	Default = TrinketESP.Settings.ShowName,
 	Callback = function(value)
 		TrinketESP.Settings.ShowName = value
 	end,
 }):Colorpicker({
 	Name = "Name ESP Color",
 	Flag = "Trinket_Name_ESP_Color",
-	Default = Color3.fromRGB(255, 255, 255),
+	Default = TrinketESP.Settings.NameColor,
 })
 
 DistanceESPToggle = TrinketESPSection:Toggle({
 	Name = "Distance",
 	Flag = "Trinket_Distance_ESP_Toggle",
-	Default = false,
+	Default = TrinketESP.Settings.ShowDistance,
 	Callback = function(value)
 		TrinketESP.Settings.ShowDistance = value
 	end,
 }):Colorpicker({
 	Name = "Distance ESP Color",
 	Flag = "Trinket_Distance_ESP_Color",
-	Default = Color3.fromRGB(255, 255, 255),
+	Default = TrinketESP.Settings.DistanceColor,
 })
 
 ValueESPToggle = TrinketESPSection:Toggle({
 	Name = "Value",
 	Flag = "Trinket_Value_ESP_Toggle",
-	Default = false,
+	Default = TrinketESP.Settings.ShowValue,
 	Callback = function(value)
 		TrinketESP.Settings.ShowValue = value
 	end,
 }):Colorpicker({
 	Name = "Value ESP Color",
 	Flag = "Trinket_Value_ESP_Color",
-	Default = Color3.fromRGB(255, 255, 255),
+	Default = TrinketESP.Settings.ValueColor,
 })
 
 HighlightESPToggle = TrinketESPSection:Toggle({
 	Name = "Highlight",
 	Flag = "Trinket_Highlight_ESP_Toggle",
-	Default = false,
+	Default = TrinketESP.Settings.ShowHighlight,
 	Callback = function(value)
 		TrinketESP.Settings.ShowHighlight = value
 	end,
 })
-	:Colorpicker({
-		Name = "Highlight Fill ESP Color",
-		Flag = "Trinket_Highlight_Fill_ESP_Color",
-		Default = Color3.fromRGB(255, 255, 255),
-	})
-	:Colorpicker({
-		Name = "Highlight Outline ESP Color",
-		Flag = "Trinket_Highlight_Outline_ESP_Color",
-		Default = Color3.fromRGB(255, 255, 255),
-	})
+
+TrinketESPSection:Label("Highlight Fill", "Left"):Colorpicker({
+	Name = "Highlight Fill ESP Color",
+	Flag = "Trinket_Highlight_Fill_ESP_Color",
+	Default = TrinketESP.Settings.HighlightFillColor,
+})
+
+TrinketESPSection:Label("Highlight Outline", "Left"):Colorpicker({
+	Name = "Highlight Outline ESP Color",
+	Flag = "Trinket_Highlight_Outline_ESP_Color",
+	Default = TrinketESP.Settings.HighlightOutlineColor,
+})
 
 TrinketESPSection:Slider({
 	Name = "Trinket ESP Max Distance",
 	Flag = "Trinket_ESP_Max_Distance",
 	Min = 1,
 	Max = 1000,
-	Default = 250,
+	Default = TrinketESP.Settings.MaxDistance,
 	Callback = function(value)
 		TrinketESP.Settings.MaxDistance = tonumber(value)
 	end,
@@ -329,7 +337,7 @@ TrinketESPSection:Slider({
 TrinketAutoGrabSection:Toggle({
 	Name = "Trinket Auto Grab",
 	Flag = "Trinket_AutoGrab_Toggle",
-	Default = false,
+	Default = TrinketAutograb.Settings.Enabled,
 	Callback = function(value)
 		TrinketAutograb.Settings.Enabled = value
 	end,
@@ -340,7 +348,7 @@ TrinketAutoGrabSection:Slider({
 	Flag = "Trinket_AutoGrab_Max_Distance",
 	Min = 1,
 	Max = 100,
-	Default = 1150,
+	Default = TrinketAutograb.Settings.MaxDistance,
 	Callback = function(value)
 		TrinketAutograb.Settings.MaxDistance = tonumber(value)
 	end,
@@ -348,51 +356,91 @@ TrinketAutoGrabSection:Slider({
 
 UI:Connect(RunService.Heartbeat, function()
 	local nameColorData = UI.Flags.Trinket_Name_ESP_Color
-	if nameColorData and nameColorData.Color ~= TrinketESP.Settings.NameColor then
+	if
+		nameColorData
+		and (
+			nameColorData.Color ~= TrinketESP.Settings.NameColor
+			or nameColorData.Alpha ~= TrinketESP.Settings.NameAlpha
+		)
+	then
 		TrinketESP.Settings.NameColor = nameColorData.Color
+		TrinketESP.Settings.NameAlpha = nameColorData.Alpha or 1
 		for _, drawings in pairs(TrinketESP.Drawings) do
 			if drawings.Name then
 				drawings.Name.Color = nameColorData.Color
+				drawings.Name.Transparency = 1 - (nameColorData.Alpha or 1)
 			end
 		end
 	end
 
 	local distanceColorData = UI.Flags.Trinket_Distance_ESP_Color
-	if distanceColorData and distanceColorData.Color ~= TrinketESP.Settings.DistanceColor then
+	if
+		distanceColorData
+		and (
+			distanceColorData.Color ~= TrinketESP.Settings.DistanceColor
+			or distanceColorData.Alpha ~= TrinketESP.Settings.DistanceAlpha
+		)
+	then
 		TrinketESP.Settings.DistanceColor = distanceColorData.Color
+		TrinketESP.Settings.DistanceAlpha = distanceColorData.Alpha or 1
 		for _, drawings in pairs(TrinketESP.Drawings) do
 			if drawings.Distance then
 				drawings.Distance.Color = distanceColorData.Color
+				drawings.Distance.Transparency = 1 - (distanceColorData.Alpha or 1)
 			end
 		end
 	end
 
 	local valueColorData = UI.Flags.Trinket_Value_ESP_Color
-	if valueColorData and valueColorData.Color ~= TrinketESP.Settings.ValueColor then
+	if
+		valueColorData
+		and (
+			valueColorData.Color ~= TrinketESP.Settings.ValueColor
+			or valueColorData.Alpha ~= TrinketESP.Settings.ValueAlpha
+		)
+	then
 		TrinketESP.Settings.ValueColor = valueColorData.Color
+		TrinketESP.Settings.ValueAlpha = valueColorData.Alpha or 1
 		for _, drawings in pairs(TrinketESP.Drawings) do
 			if drawings.Value then
 				drawings.Value.Color = valueColorData.Color
+				drawings.Value.Transparency = 1 - (valueColorData.Alpha or 1)
 			end
 		end
 	end
 
 	local highlightFillData = UI.Flags.Trinket_Highlight_Fill_ESP_Color
-	if highlightFillData and highlightFillData.Color ~= TrinketESP.Settings.HighlightFillColor then
+	if
+		highlightFillData
+		and (
+			highlightFillData.Color ~= TrinketESP.Settings.HighlightFillColor
+			or highlightFillData.Alpha ~= TrinketESP.Settings.HighlightFillAlpha
+		)
+	then
 		TrinketESP.Settings.HighlightFillColor = highlightFillData.Color
+		TrinketESP.Settings.HighlightFillAlpha = highlightFillData.Alpha or 1
 		for _, drawings in pairs(TrinketESP.Drawings) do
 			if drawings.Highlight then
 				drawings.Highlight.FillColor = highlightFillData.Color
+				drawings.Highlight.FillTransparency = 1 - (highlightFillData.Alpha or 1)
 			end
 		end
 	end
 
 	local highlightOutlineData = UI.Flags.Trinket_Highlight_Outline_ESP_Color
-	if highlightOutlineData and highlightOutlineData.Color ~= TrinketESP.Settings.HighlightOutlineColor then
+	if
+		highlightOutlineData
+		and (
+			highlightOutlineData.Color ~= TrinketESP.Settings.HighlightOutlineColor
+			or highlightOutlineData.Alpha ~= TrinketESP.Settings.HighlightOutlineAlpha
+		)
+	then
 		TrinketESP.Settings.HighlightOutlineColor = highlightOutlineData.Color
+		TrinketESP.Settings.HighlightOutlineAlpha = highlightOutlineData.Alpha or 1
 		for _, drawings in pairs(TrinketESP.Drawings) do
 			if drawings.Highlight then
 				drawings.Highlight.OutlineColor = highlightOutlineData.Color
+				drawings.Highlight.OutlineTransparency = 1 - (highlightOutlineData.Alpha or 1)
 			end
 		end
 	end
@@ -1274,4 +1322,3 @@ UI:Notify({
 })
 ]]
 --
-
