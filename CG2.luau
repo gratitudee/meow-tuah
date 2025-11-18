@@ -27,7 +27,7 @@ local FindFirstChild = Utility.FindFirstChild
 local FindFirstChildOfClass = Utility.FindFirstChildOfClass
 local FindFirstChildWhichIsA = Utility.FindFirstChildWhichIsA
 local GetChildren = Utility.GetChildren
-local Trinkets = FindFirstChild(Workspace, "Trinkets")
+local Trinkets = FindFirstChild(Workspace, "TrinketSpawns")
 
 local CleanupRegistry = {
 	Connections = {},
@@ -1322,3 +1322,4 @@ UI:Notify({
 })
 ]]
 --
+
