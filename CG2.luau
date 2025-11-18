@@ -10,10 +10,10 @@ end
 
 -- References
 local Workspace = Services.Workspace
+local ReplicatedStorage = Services.ReplicatedStorage
 local RunService = Services.RunService
 local CoreGui = Services.CoreGui
 local TextService = Utility.GetService("TextService")
-local VirtualInputManager = Services.VirtualInputManager
 
 local Player = Utility.GetPlayer()
 local IndexedGetTextSize = Utility.index(TextService, "GetTextSize")
@@ -22,12 +22,12 @@ local ViewportSize = Utility.index(Camera, "ViewportSize")
 local Heartbeat = Utility.index(RunService, "Heartbeat")
 local RenderStepped = Utility.index(RunService, "RenderStepped")
 local WorldToViewportPoint = Utility.index(Camera, "WorldToViewportPoint")
-local SendKeyEvent = Utility.index(VirtualInputManager, "SendKeyEvent")
 local FindFirstChild = Utility.FindFirstChild
 local FindFirstChildOfClass = Utility.FindFirstChildOfClass
 local FindFirstChildWhichIsA = Utility.FindFirstChildWhichIsA
 local GetChildren = Utility.GetChildren
 local Trinkets = FindFirstChild(Workspace, "TrinketSpawns")
+local ParryEvent = FindFirstChild(ReplicatedStorage, "ReliableRedEvent")
 
 local CleanupRegistry = {
 	Connections = {},
@@ -447,10 +447,23 @@ UI:Connect(RunService.Heartbeat, function()
 end)
 
 function AutoParry:SimulateKeyFromKeyEvents(KeyCode)
-	SendKeyEvent(VirtualInputManager, true, KeyCode, false, nil)
-	local KeyPressDelay = math.random(0.045, 0.087)
-	task.wait(KeyPressDelay)
-	SendKeyEvent(VirtualInputManager, false, KeyCode, false, nil)
+	ParryEvent:FireServer({
+		["\x14"] = {
+			{
+				n = 0,
+			},
+		},
+	}, {})
+
+	task.wait(0.09)
+
+	ParryEvent:FireServer({
+		["\x15"] = {
+			{
+				n = 0,
+			},
+		},
+	}, {})
 end
 
 function AutoParry:Initialise()
@@ -1322,4 +1335,3 @@ UI:Notify({
 })
 ]]
 --
-
