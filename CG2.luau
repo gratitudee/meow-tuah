@@ -176,6 +176,226 @@ local function CleanupEverything()
 	})
 end
 
+local Window = UI:Window({
+	Name = "MEOW TUAH - CULT GAME 2",
+	Size = UDim2.new(0, 600, 0, 500),
+	GradientTitle = {
+		Enabled = true,
+		Start = Color3.fromRGB(255, 0, 0),
+		Middle = Color3.fromRGB(0, 255, 0),
+		End = Color3.fromRGB(0, 0, 255),
+		Speed = 1,
+	},
+})
+
+local AutoParryPage = Window:Page({
+	Name = "Auto Parry",
+	Columns = 1,
+})
+
+local TrinketPage = Window:Page({
+	Name = "Trinkets",
+	Columns = 2,
+})
+
+local AutoParrySection1 = AutoParryPage:Section({
+	Name = "Main",
+	Side = 1,
+})
+
+local TrinketESPSection = TrinketPage:Section({
+	Name = "Visuals",
+	Side = 1,
+})
+
+local TrinketAutoGrabSection = TrinketPage:Section({
+	Name = "Auto-Grab",
+	Side = 2,
+})
+
+local AutoParryToggle
+local NameESPToggle, DistanceESPToggle, ValueESPToggle, HighlightESPToggle
+
+AutoParryToggle = AutoParrySection1:Toggle({
+	Name = "Auto Parry",
+	Flag = "Auto_Parry_Toggle",
+	Default = false,
+	Callback = function(value)
+		AutoParry.Settings.Enabled = value
+	end,
+})
+
+AutoParryToggle:Keybind({
+	Name = "Auto Parry Key",
+	Flag = "Auto_Parry_Keybind",
+	Default = Enum.KeyCode.E,
+	Mode = "Hold",
+	Callback = function(toggled)
+		AutoParryToggle:Set(toggled)
+	end,
+})
+
+AutoParrySection1:Slider({
+	Name = "Auto Parry Max Distance",
+	Flag = "Auto_Parry_Max_Distance",
+	Min = 1,
+	Max = 20,
+	Default = 10,
+	Callback = function(value)
+		AutoParry.Settings.MaxDistance = tonumber(value)
+	end,
+})
+
+TrinketESPSection:Toggle({
+	Name = "Trinket ESP",
+	Flag = "Trinket_ESP_Toggle",
+	Default = false,
+	Callback = function(value)
+		TrinketESP.Settings.Enabled = value
+	end,
+})
+
+NameESPToggle = TrinketESPSection:Toggle({
+	Name = "Name",
+	Flag = "Trinket_Name_ESP_Toggle",
+	Default = false,
+	Callback = function(value)
+		TrinketESP.Settings.ShowName = value
+	end,
+}):Colorpicker({
+	Name = "Name ESP Color",
+	Flag = "Trinket_Name_ESP_Color",
+	Default = Color3.fromRGB(255, 255, 255),
+})
+
+DistanceESPToggle = TrinketESPSection:Toggle({
+	Name = "Distance",
+	Flag = "Trinket_Distance_ESP_Toggle",
+	Default = false,
+	Callback = function(value)
+		TrinketESP.Settings.ShowDistance = value
+	end,
+}):Colorpicker({
+	Name = "Distance ESP Color",
+	Flag = "Trinket_Distance_ESP_Color",
+	Default = Color3.fromRGB(255, 255, 255),
+})
+
+ValueESPToggle = TrinketESPSection:Toggle({
+	Name = "Value",
+	Flag = "Trinket_Value_ESP_Toggle",
+	Default = false,
+	Callback = function(value)
+		TrinketESP.Settings.ShowValue = value
+	end,
+}):Colorpicker({
+	Name = "Value ESP Color",
+	Flag = "Trinket_Value_ESP_Color",
+	Default = Color3.fromRGB(255, 255, 255),
+})
+
+HighlightESPToggle = TrinketESPSection:Toggle({
+	Name = "Highlight",
+	Flag = "Trinket_Highlight_ESP_Toggle",
+	Default = false,
+	Callback = function(value)
+		TrinketESP.Settings.ShowHighlight = value
+	end,
+})
+	:Colorpicker({
+		Name = "Highlight Fill ESP Color",
+		Flag = "Trinket_Highlight_Fill_ESP_Color",
+		Default = Color3.fromRGB(255, 255, 255),
+	})
+	:Colorpicker({
+		Name = "Highlight Outline ESP Color",
+		Flag = "Trinket_Highlight_Outline_ESP_Color",
+		Default = Color3.fromRGB(255, 255, 255),
+	})
+
+TrinketESPSection:Slider({
+	Name = "Trinket ESP Max Distance",
+	Flag = "Trinket_ESP_Max_Distance",
+	Min = 1,
+	Max = 1000,
+	Default = 250,
+	Callback = function(value)
+		TrinketESP.Settings.MaxDistance = tonumber(value)
+	end,
+})
+
+TrinketAutoGrabSection:Toggle({
+	Name = "Trinket Auto Grab",
+	Flag = "Trinket_AutoGrab_Toggle",
+	Default = false,
+	Callback = function(value)
+		TrinketAutograb.Settings.Enabled = value
+	end,
+})
+
+TrinketAutoGrabSection:Slider({
+	Name = "Trinket Auto Grab Max Distance",
+	Flag = "Trinket_AutoGrab_Max_Distance",
+	Min = 1,
+	Max = 100,
+	Default = 1150,
+	Callback = function(value)
+		TrinketAutograb.Settings.MaxDistance = tonumber(value)
+	end,
+})
+
+UI:Connect(RunService.Heartbeat, function()
+	local nameColorData = UI.Flags.Trinket_Name_ESP_Color
+	if nameColorData and nameColorData.Color ~= TrinketESP.Settings.NameColor then
+		TrinketESP.Settings.NameColor = nameColorData.Color
+		for _, drawings in pairs(TrinketESP.Drawings) do
+			if drawings.Name then
+				drawings.Name.Color = nameColorData.Color
+			end
+		end
+	end
+
+	local distanceColorData = UI.Flags.Trinket_Distance_ESP_Color
+	if distanceColorData and distanceColorData.Color ~= TrinketESP.Settings.DistanceColor then
+		TrinketESP.Settings.DistanceColor = distanceColorData.Color
+		for _, drawings in pairs(TrinketESP.Drawings) do
+			if drawings.Distance then
+				drawings.Distance.Color = distanceColorData.Color
+			end
+		end
+	end
+
+	local valueColorData = UI.Flags.Trinket_Value_ESP_Color
+	if valueColorData and valueColorData.Color ~= TrinketESP.Settings.ValueColor then
+		TrinketESP.Settings.ValueColor = valueColorData.Color
+		for _, drawings in pairs(TrinketESP.Drawings) do
+			if drawings.Value then
+				drawings.Value.Color = valueColorData.Color
+			end
+		end
+	end
+
+	local highlightFillData = UI.Flags.Trinket_Highlight_Fill_ESP_Color
+	if highlightFillData and highlightFillData.Color ~= TrinketESP.Settings.HighlightFillColor then
+		TrinketESP.Settings.HighlightFillColor = highlightFillData.Color
+		for _, drawings in pairs(TrinketESP.Drawings) do
+			if drawings.Highlight then
+				drawings.Highlight.FillColor = highlightFillData.Color
+			end
+		end
+	end
+
+	local highlightOutlineData = UI.Flags.Trinket_Highlight_Outline_ESP_Color
+	if highlightOutlineData and highlightOutlineData.Color ~= TrinketESP.Settings.HighlightOutlineColor then
+		TrinketESP.Settings.HighlightOutlineColor = highlightOutlineData.Color
+		for _, drawings in pairs(TrinketESP.Drawings) do
+			if drawings.Highlight then
+				drawings.Highlight.OutlineColor = highlightOutlineData.Color
+			end
+		end
+	end
+end)
+
 function AutoParry:SimulateKeyFromKeyEvents(KeyCode)
 	SendKeyEvent(VirtualInputManager, true, KeyCode, false, nil)
 	local KeyPressDelay = math.random(0.045, 0.087)
@@ -322,6 +542,7 @@ function AutoParry:OnAttackDetected(player, character, track)
 	end
 
 	self:ExecuteParry()
+	print("execd")
 end
 
 function AutoParry:ExecuteParry()
@@ -333,6 +554,7 @@ function AutoParry:Toggle()
 	if not self.Settings.Enabled then
 		self:ClearTarget()
 	end
+	print(self.Settings.Enabled)
 end
 
 function AutoParry:SetMaxDistance(distance)
@@ -629,6 +851,7 @@ function TrinketShared:Initialise()
 	end
 
 	if not Trinkets then
+		warn("Trinkets folder not found!")
 		return
 	end
 
@@ -670,6 +893,7 @@ function TrinketShared:Initialise()
 	self._initialized = true
 end
 
+--[[
 UI:Popup({
 	Title = "meow tuah (cg2)",
 	Icon = "cat",
@@ -951,6 +1175,7 @@ local function SettingsTab()
 		Flag = "ScriptDrawingFont",
 		AllowNone = false,
 		Callback = function(option)
+			print(option)
 			MainScript.Font = option
 			TrinketESP:UpdateFontSettings()
 		end,
@@ -1032,20 +1257,18 @@ local function SettingsTab()
 		end,
 	})
 end
-
-AutoParryTab()
-TrinketTab()
-SettingsTab()
+]]
+--
 TrinketShared:Initialise()
 TrinketESP:Initialise()
 TrinketAutograb:Initialise()
 AutoParry:Initialise()
+--[[
 UI:Notify({
 	Title = "Script Loaded",
 	Content = "Script Successfully Loaded!",
 	Duration = 3,
 	Icon = "check",
 })
-
-
-
+]]
+--
