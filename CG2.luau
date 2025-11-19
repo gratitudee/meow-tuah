@@ -144,12 +144,6 @@ do
 		["Model"] = 67,
 	}
 
-	local AnimationFolderBlocklist = {
-		"Gate",
-		"Combat",
-		"Emotes",
-	}
-
 	local AnimationNameWhitelist = {
 		"Swing",
 		"Critical",
@@ -192,18 +186,12 @@ do
 		end
 
 		for _, SubFolder in pairs(GetChildren(Animations)) do
-			if table.find(AnimationFolderBlocklist, SubFolder.Name) then
-				continue
-			end
-
 			for _, Animations in pairs(GetDescendants(SubFolder)) do
 				if Animations:IsA("Animation") and ContainsWhitelistedName(Animations.Name) then
 					table.insert(AutoParry.AllowList, Animations.AnimationId)
 				end
 			end
 		end
-
-		return
 	end
 
 	local function GetTextSize(text, size, font)
