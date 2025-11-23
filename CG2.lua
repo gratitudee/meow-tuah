@@ -11,9 +11,9 @@ do
 		return
 	end
 	-- Services and Utility
-	local Services = GetModuleFromRepo("Services.luau")
-	local Utility = GetModuleFromRepo("Utility.luau")
-	local UI = GetModuleFromRepo("UI.luau")
+	local Services = GetModuleFromRepo("Services.lua")
+	local Utility = GetModuleFromRepo("Utility.lua")
+	local UI = GetModuleFromRepo("UI.lua")
 
 	if not Services or not Utility or not UI then
 		printconsole("Failed to load meow-tuah", Color3.new(1, 0, 0))
@@ -1241,3 +1241,4 @@ do
 	UI:KeybindList()
 	getgenv().CG2_SCRIPT_LOADED = true
 end
+
