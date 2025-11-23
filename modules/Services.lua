@@ -1,5 +1,5 @@
 -- Service Module
-local utility = GetModuleFromRepo("Utility.luau")
+local utility = GetModuleFromRepo("Utility.lua")
 local serviceCache = {}
 
 local function getService(serviceName: string): Instance
@@ -21,6 +21,7 @@ return {
 	TweenService = getService("TweenService") :: TweenService,
 	VirtualInputManager = getService("VirtualInputManager") :: VirtualInputManager,
 }
+
 
 
 
