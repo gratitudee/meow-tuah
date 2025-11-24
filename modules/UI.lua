@@ -5202,9 +5202,7 @@ local Library do
 end
 
 getgenv().Library = Library
-
-local StartTick = os.clock();
-local Library = getgenv().Library;
+return Library
 
 --[[
     Made by samet.exe
@@ -5332,3 +5330,4 @@ local Library = getgenv().Library;
     function Library:Notification(Text: string, Duration: number, Color: Color3, Icon: table)
     function Library:KeybindList()
 ]]
+
