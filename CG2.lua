@@ -13,11 +13,11 @@ do
 	-- Services and Utility
 	local Services = GetModuleFromRepo("Services.lua")
 	local Utility = GetModuleFromRepo("Utility.lua")
-	local Library = GetModuleFromRepo("UI.lua")
+	local UI = GetModuleFromRepo("UI.lua")
 	local SaveManager = GetModuleFromRepo("SaveManager.lua")
 	local ThemeManager = GetModuleFromRepo("ThemeManager.lua")
 
-	if not Services or not Utility then
+	if not Services or not Utility or not UI then
 		printconsole("Failed to load meow-tuah", Color3.new(1, 0, 0))
 		return
 	end
@@ -279,163 +279,124 @@ do
 		table.clear(TrinketShared.Trinkets)
 	end
 
-	-- UI Init using new library
-	local Window = Library:CreateWindow({
-		Title = "MEOW TUAH",
-		Center = true,
-		AutoShow = true,
-		TabPadding = 8,
-		MenuFadeTime = 0.2,
+	-- UI Init
+	local Window = UI:Window({
+		Name = "MEOW TUAH",
+		Size = UDim2.new(0, 600, 0, 500),
+		GradientTitle = {
+			Enabled = true,
+			Start = Color3.fromRGB(255, 0, 0),
+			Middle = Color3.fromRGB(0, 255, 0),
+			End = Color3.fromRGB(0, 0, 255),
+			Speed = 1,
+		},
 	})
 
-	-- Create tabs
-	local Tabs = {
-		AutoParry = Window:AddTab("Auto Parry"),
-		Trinkets = Window:AddTab("Trinkets"),
-		Movement = Window:AddTab("Movement"),
-		Settings = Window:AddTab("UI Settings"),
-	}
+	local AutoParryPage = Window:Page({
+		Name = "Auto Parry",
+		Columns = 1,
+	})
 
-	-- Auto Parry Tab
-	local AutoParryLeftGroup = Tabs.AutoParry:AddLeftGroupbox("Main")
+	local AutoParrySection1 = AutoParryPage:Section({
+		Name = "Main",
+		Side = 1,
+	})
 
-	local AutoParryToggle = AutoParryLeftGroup:AddToggle("AutoParryToggle", {
-		Text = "Auto Parry",
+	local AutoParryToggle = AutoParrySection1:Toggle({
+		Name = "Auto Parry",
+		Flag = "Auto_Parry_Toggle",
 		Default = false,
+		Callback = function(value)
+			AutoParry.Settings.Enabled = value
+		end,
 	})
 
-	AutoParryToggle:AddKeyPicker("AutoParryKey", {
-		Default = "E",
+	AutoParryToggle:Keybind({
+		Name = "Auto Parry Key",
+		Flag = "Auto_Parry_Keybind",
+		Default = Enum.KeyCode.E,
 		Mode = "Hold",
-		Text = "Auto Parry Key",
-		NoUI = false,
+		Callback = function(toggled)
+			AutoParryToggle:Set(toggled)
+		end,
 	})
 
-	AutoParryLeftGroup:AddSlider("AutoParryDistance", {
-		Text = "Auto Parry Max Distance",
-		Default = 10,
+	AutoParrySection1:Slider({
+		Name = "Auto Parry Max Distance",
+		Flag = "Auto_Parry_Max_Distance",
 		Min = 1,
 		Max = 20,
-		Rounding = 0,
+		Default = 10,
+		Callback = function(value)
+			AutoParry.Settings.MaxDistance = tonumber(value)
+		end,
 	})
 
-	AutoParryLeftGroup:AddSlider("AutoParryPercentage", {
-		Text = "Animation Percentage",
-		Default = 50,
+	AutoParrySection1:Slider({
+		Name = "Animation Percentage",
+		Flag = "Auto_Parry_Animation_Percentage",
 		Min = 1,
 		Max = 100,
-		Rounding = 0,
+		Default = 50,
 		Suffix = "%",
+		Callback = function(value)
+			AutoParry.Settings.AnimationPercentage = tonumber(value)
+		end,
 	})
 
-	AutoParryLeftGroup:AddSlider("AutoParryPing", {
-		Text = "Ping Adjustment",
-		Default = 100,
+	AutoParrySection1:Slider({
+		Name = "Ping Adjustment",
+		Flag = "Auto_Parry_Ping_Adjustment",
 		Min = 0,
 		Max = 200,
-		Rounding = 0,
-		Suffix = "%",
-	})
-
-	-- Trinkets Tab
-	local TrinketsLeftGroup = Tabs.Trinkets:AddLeftGroupbox("Visuals")
-	local TrinketsRightGroup = Tabs.Trinkets:AddRightGroupbox("Auto-Grab")
-
-	-- Trinket ESP Toggles
-	local TrinketESPToggle = TrinketsLeftGroup:AddToggle("TrinketESP", {
-		Text = "Trinket ESP",
-		Default = false,
-	})
-
-	local TrinketNameToggle = TrinketsLeftGroup:AddToggle("TrinketName", {
-		Text = "Name",
-		Default = false,
-	})
-
-	TrinketsLeftGroup:AddLabel("Name Color"):AddColorPicker("TrinketNameColor", {
-		Default = Color3.new(1, 1, 1),
-		Title = "Name Color",
-	})
-
-	local TrinketDistanceToggle = TrinketsLeftGroup:AddToggle("TrinketDistance", {
-		Text = "Distance",
-		Default = false,
-	})
-
-	TrinketsLeftGroup:AddLabel("Distance Color"):AddColorPicker("TrinketDistanceColor", {
-		Default = Color3.new(1, 1, 1),
-		Title = "Distance Color",
-	})
-
-	local TrinketValueToggle = TrinketsLeftGroup:AddToggle("TrinketValue", {
-		Text = "Value",
-		Default = false,
-	})
-
-	TrinketsLeftGroup:AddLabel("Value Color"):AddColorPicker("TrinketValueColor", {
-		Default = Color3.new(1, 1, 1),
-		Title = "Value Color",
-	})
-
-	local TrinketHighlightToggle = TrinketsLeftGroup:AddToggle("TrinketHighlight", {
-		Text = "Highlight",
-		Default = false,
-	})
-
-	TrinketsLeftGroup:AddLabel("Highlight Fill"):AddColorPicker("TrinketHighlightFill", {
-		Default = Color3.new(1, 0, 0),
-		Title = "Highlight Fill",
-	})
-
-	TrinketsLeftGroup:AddLabel("Highlight Outline"):AddColorPicker("TrinketHighlightOutline", {
-		Default = Color3.new(1, 1, 1),
-		Title = "Highlight Outline",
-	})
-
-	TrinketsLeftGroup:AddSlider("TrinketESPDistance", {
-		Text = "Trinket ESP Max Distance",
-		Default = 1000,
-		Min = 1,
-		Max = 1000,
-		Rounding = 0,
-	})
-
-	-- Auto Grab
-	TrinketsRightGroup:AddToggle("TrinketAutoGrab", {
-		Text = "Trinket Auto Grab",
-		Default = false,
-	})
-
-	TrinketsRightGroup:AddSlider("TrinketGrabDistance", {
-		Text = "Trinket Auto Grab Max Distance",
 		Default = 100,
-		Min = 1,
-		Max = 100,
-		Rounding = 0,
+		Suffix = "%",
+		Callback = function(value)
+			AutoParry.Settings.PingAdjustment = tonumber(value)
+		end,
 	})
 
-	-- Movement Tab
-	local MovementLeftGroup = Tabs.Movement:AddLeftGroupbox("Main")
-
-	local PerfectSlideToggle = MovementLeftGroup:AddToggle("PerfectSlide", {
-		Text = "Perfect Slide",
-		Default = true,
+	local TrinketPage = Window:Page({
+		Name = "Trinkets",
+		Columns = 2,
 	})
 
-	PerfectSlideToggle:AddKeyPicker("PerfectSlideKey", {
-		Default = "E",
-		Mode = "Hold",
-		Text = "Perfect Slide Bind",
-		NoUI = false,
+	local TrinketESPSection = TrinketPage:Section({
+		Name = "Visuals",
+		Side = 1,
 	})
 
-	-- Settings Tab
-	local SettingsLeftGroup = Tabs.Settings:AddLeftGroupbox("Configuration")
-	local SettingsRightGroup = Tabs.Settings:AddRightGroupbox("Settings")
+	local TrinketAutoGrabSection = TrinketPage:Section({
+		Name = "Auto-Grab",
+		Side = 2,
+	})
 
-	-- Theme buttons
-	SettingsLeftGroup:AddLabel("Preset Themes", true)
+	local Movement = Window:Page({
+		Name = "Movement",
+		Columns = 1,
+	})
 
+	local Settings = Window:Page({
+		Name = "Settings",
+		Columns = 2,
+	})
+
+	local MovementSection = Movement:Section({
+		Name = "Main",
+		Side = 1,
+	})
+
+	local Config = Settings:Section({
+		Name = "Configuration",
+		Side = 1,
+	})
+
+	local SettingsSection = Settings:Section({
+		Name = "Settings",
+		Side = 2,
+	})
+
+	Config:Label("Preset Themes", "Center")
 	local PresetThemes = {
 		{ "Default", "Default" },
 		{ "Bitchbot", "Bitchbot" },
@@ -445,170 +406,239 @@ do
 	}
 
 	for _, theme in pairs(PresetThemes) do
-		SettingsLeftGroup:AddButton({
-			Text = "Load " .. theme[1],
-			Func = function()
-				Library:Notify("Theme loading not implemented in this version", 3)
+		Config:Button({
+			Name = "Load " .. theme[1],
+			Callback = function()
+				if UI.Themes[theme[2]] then
+					for themeName, color in pairs(UI.Themes[theme[2]]) do
+						UI:ChangeTheme(themeName, color)
+					end
+					UI:Notification("Loaded " .. theme[1] .. " theme!", 3, Color3.fromRGB(0, 255, 0))
+				end
 			end,
 		})
 	end
 
-	SettingsRightGroup:AddButton({
-		Text = "Unload Script",
-		Func = function()
-			Library:Unload()
+	SettingsSection:Button({
+		Name = "Unload Script",
+		Risky = false,
+		Callback = function()
+			UI:Unload()
 			CleanupEverything()
 		end,
 	})
 
-	-- Set up OnChanged callbacks
-	Toggles.AutoParryToggle:OnChanged(function()
-		AutoParry.Settings.Enabled = Toggles.AutoParryToggle.Value
-	end)
+	local PerfectSlideToggle = MovementSection:Toggle({
+		Name = "Perfect Slide",
+		Flag = "Perfect_Slide_Toggle",
+		Default = PerfectSlide.Settings.Enabled,
+		Callback = function(value)
+			PerfectSlide.Settings.Enabled = value
+		end,
+	})
 
-	Options.AutoParryDistance:OnChanged(function()
-		AutoParry.Settings.MaxDistance = Options.AutoParryDistance.Value
-	end)
+	PerfectSlideToggle:Keybind({
+		Name = "Perfect Slide Bind",
+		Flag = "Perfect_Slide_Keybind",
+		Default = Enum.KeyCode.E,
+		Mode = "Hold",
+		Callback = function(toggled)
+			PerfectSlideToggle:Set(toggled)
+		end,
+	})
 
-	Options.AutoParryPercentage:OnChanged(function()
-		AutoParry.Settings.AnimationPercentage = Options.AutoParryPercentage.Value
-	end)
+	TrinketESPSection:Toggle({
+		Name = "Trinket ESP",
+		Flag = "Trinket_ESP_Toggle",
+		Default = TrinketESP.Settings.Enabled,
+		Callback = function(value)
+			TrinketESP.Settings.Enabled = value
+		end,
+	})
 
-	Options.AutoParryPing:OnChanged(function()
-		AutoParry.Settings.PingAdjustment = Options.AutoParryPing.Value
-	end)
+	TrinketESPSection:Toggle({
+		Name = "Name",
+		Flag = "Trinket_Name_ESP_Toggle",
+		Default = TrinketESP.Settings.ShowName,
+		Callback = function(value)
+			TrinketESP.Settings.ShowName = value
+		end,
+	}):Colorpicker({
+		Name = "Name ESP Color",
+		Flag = "Trinket_Name_ESP_Color",
+		Default = TrinketESP.Settings.NameColor,
+	})
 
-	Toggles.TrinketESP:OnChanged(function()
-		TrinketESP.Settings.Enabled = Toggles.TrinketESP.Value
-	end)
+	TrinketESPSection:Toggle({
+		Name = "Distance",
+		Flag = "Trinket_Distance_ESP_Toggle",
+		Default = TrinketESP.Settings.ShowDistance,
+		Callback = function(value)
+			TrinketESP.Settings.ShowDistance = value
+		end,
+	}):Colorpicker({
+		Name = "Distance ESP Color",
+		Flag = "Trinket_Distance_ESP_Color",
+		Default = TrinketESP.Settings.DistanceColor,
+	})
 
-	Toggles.TrinketName:OnChanged(function()
-		TrinketESP.Settings.ShowName = Toggles.TrinketName.Value
-	end)
+	TrinketESPSection:Toggle({
+		Name = "Value",
+		Flag = "Trinket_Value_ESP_Toggle",
+		Default = TrinketESP.Settings.ShowValue,
+		Callback = function(value)
+			TrinketESP.Settings.ShowValue = value
+		end,
+	}):Colorpicker({
+		Name = "Value ESP Color",
+		Flag = "Trinket_Value_ESP_Color",
+		Default = TrinketESP.Settings.ValueColor,
+	})
 
-	Toggles.TrinketDistance:OnChanged(function()
-		TrinketESP.Settings.ShowDistance = Toggles.TrinketDistance.Value
-	end)
+	HighlightESPToggle = TrinketESPSection:Toggle({
+		Name = "Highlight",
+		Flag = "Trinket_Highlight_ESP_Toggle",
+		Default = TrinketESP.Settings.ShowHighlight,
+		Callback = function(value)
+			TrinketESP.Settings.ShowHighlight = value
+		end,
+	})
 
-	Toggles.TrinketValue:OnChanged(function()
-		TrinketESP.Settings.ShowValue = Toggles.TrinketValue.Value
-	end)
+	TrinketESPSection:Label("Highlight Fill", "Left"):Colorpicker({
+		Name = "Highlight Fill ESP Color",
+		Flag = "Trinket_Highlight_Fill_ESP_Color",
+		Default = TrinketESP.Settings.HighlightFillColor,
+	})
 
-	Toggles.TrinketHighlight:OnChanged(function()
-		TrinketESP.Settings.ShowHighlight = Toggles.TrinketHighlight.Value
-	end)
+	TrinketESPSection:Label("Highlight Outline", "Left"):Colorpicker({
+		Name = "Highlight Outline ESP Color",
+		Flag = "Trinket_Highlight_Outline_ESP_Color",
+		Default = TrinketESP.Settings.HighlightOutlineColor,
+	})
 
-	Options.TrinketESPDistance:OnChanged(function()
-		TrinketESP.Settings.MaxDistance = Options.TrinketESPDistance.Value
-	end)
+	TrinketESPSection:Slider({
+		Name = "Trinket ESP Max Distance",
+		Flag = "Trinket_ESP_Max_Distance",
+		Min = 1,
+		Max = 1000,
+		Default = TrinketESP.Settings.MaxDistance,
+		Callback = function(value)
+			TrinketESP.Settings.MaxDistance = tonumber(value)
+		end,
+	})
 
-	Toggles.TrinketAutoGrab:OnChanged(function()
-		TrinketAutograb.Settings.Enabled = Toggles.TrinketAutoGrab.Value
-	end)
+	TrinketAutoGrabSection:Toggle({
+		Name = "Trinket Auto Grab",
+		Flag = "Trinket_AutoGrab_Toggle",
+		Default = TrinketAutograb.Settings.Enabled,
+		Callback = function(value)
+			TrinketAutograb.Settings.Enabled = value
+		end,
+	})
 
-	Options.TrinketGrabDistance:OnChanged(function()
-		TrinketAutograb.Settings.MaxDistance = Options.TrinketGrabDistance.Value
-	end)
+	TrinketAutoGrabSection:Slider({
+		Name = "Trinket Auto Grab Max Distance",
+		Flag = "Trinket_AutoGrab_Max_Distance",
+		Min = 1,
+		Max = 100,
+		Default = TrinketAutograb.Settings.MaxDistance,
+		Callback = function(value)
+			TrinketAutograb.Settings.MaxDistance = tonumber(value)
+		end,
+	})
 
-	Toggles.PerfectSlide:OnChanged(function()
-		PerfectSlide.Settings.Enabled = Toggles.PerfectSlide.Value
-	end)
+	-- UI Update
+	UI:Connect(RunService.Heartbeat, function()
+		local nameColorData = UI.Flags.Trinket_Name_ESP_Color
+		if
+			nameColorData
+			and (
+				nameColorData.Color ~= TrinketESP.Settings.NameColor
+				or nameColorData.Alpha ~= TrinketESP.Settings.NameAlpha
+			)
+		then
+			TrinketESP.Settings.NameColor = nameColorData.Color
+			TrinketESP.Settings.NameAlpha = nameColorData.Alpha or 1
+			for _, drawings in pairs(TrinketESP.Drawings) do
+				if drawings.Name then
+					drawings.Name.Color = nameColorData.Color
+					drawings.Name.Transparency = 1 - (nameColorData.Alpha or 1)
+				end
+			end
+		end
 
-	-- Color picker callbacks
-	Options.TrinketNameColor:OnChanged(function()
-		TrinketESP.Settings.NameColor = Options.TrinketNameColor.Value
-		TrinketESP.Settings.NameAlpha = 1 - Options.TrinketNameColor.Transparency
-		for _, drawings in pairs(TrinketESP.Drawings) do
-			if drawings.Name then
-				drawings.Name.Color = Options.TrinketNameColor.Value
-				drawings.Name.Transparency = Options.TrinketNameColor.Transparency
+		local distanceColorData = UI.Flags.Trinket_Distance_ESP_Color
+		if
+			distanceColorData
+			and (
+				distanceColorData.Color ~= TrinketESP.Settings.DistanceColor
+				or distanceColorData.Alpha ~= TrinketESP.Settings.DistanceAlpha
+			)
+		then
+			TrinketESP.Settings.DistanceColor = distanceColorData.Color
+			TrinketESP.Settings.DistanceAlpha = distanceColorData.Alpha or 1
+			for _, drawings in pairs(TrinketESP.Drawings) do
+				if drawings.Distance then
+					drawings.Distance.Color = distanceColorData.Color
+					drawings.Distance.Transparency = 1 - (distanceColorData.Alpha or 1)
+				end
+			end
+		end
+
+		local valueColorData = UI.Flags.Trinket_Value_ESP_Color
+		if
+			valueColorData
+			and (
+				valueColorData.Color ~= TrinketESP.Settings.ValueColor
+				or valueColorData.Alpha ~= TrinketESP.Settings.ValueAlpha
+			)
+		then
+			TrinketESP.Settings.ValueColor = valueColorData.Color
+			TrinketESP.Settings.ValueAlpha = valueColorData.Alpha or 1
+			for _, drawings in pairs(TrinketESP.Drawings) do
+				if drawings.Value then
+					drawings.Value.Color = valueColorData.Color
+					drawings.Value.Transparency = 1 - (valueColorData.Alpha or 1)
+				end
+			end
+		end
+
+		local highlightFillData = UI.Flags.Trinket_Highlight_Fill_ESP_Color
+		if
+			highlightFillData
+			and (
+				highlightFillData.Color ~= TrinketESP.Settings.HighlightFillColor
+				or highlightFillData.Alpha ~= TrinketESP.Settings.HighlightFillAlpha
+			)
+		then
+			TrinketESP.Settings.HighlightFillColor = highlightFillData.Color
+			TrinketESP.Settings.HighlightFillAlpha = highlightFillData.Alpha or 1
+			for _, drawings in pairs(TrinketESP.Drawings) do
+				if drawings.Highlight then
+					drawings.Highlight.FillColor = highlightFillData.Color
+					drawings.Highlight.FillTransparency = highlightFillData.Alpha or 1
+				end
+			end
+		end
+
+		local highlightOutlineData = UI.Flags.Trinket_Highlight_Outline_ESP_Color
+		if
+			highlightOutlineData
+			and (
+				highlightOutlineData.Color ~= TrinketESP.Settings.HighlightOutlineColor
+				or highlightOutlineData.Alpha ~= TrinketESP.Settings.HighlightOutlineAlpha
+			)
+		then
+			TrinketESP.Settings.HighlightOutlineColor = highlightOutlineData.Color
+			TrinketESP.Settings.HighlightOutlineAlpha = highlightOutlineData.Alpha or 1
+			for _, drawings in pairs(TrinketESP.Drawings) do
+				if drawings.Highlight then
+					drawings.Highlight.OutlineColor = highlightOutlineData.Color
+					drawings.Highlight.OutlineTransparency = highlightOutlineData.Alpha or 1
+				end
 			end
 		end
 	end)
-
-	Options.TrinketDistanceColor:OnChanged(function()
-		TrinketESP.Settings.DistanceColor = Options.TrinketDistanceColor.Value
-		TrinketESP.Settings.DistanceAlpha = 1 - Options.TrinketDistanceColor.Transparency
-		for _, drawings in pairs(TrinketESP.Drawings) do
-			if drawings.Distance then
-				drawings.Distance.Color = Options.TrinketDistanceColor.Value
-				drawings.Distance.Transparency = Options.TrinketDistanceColor.Transparency
-			end
-		end
-	end)
-
-	Options.TrinketValueColor:OnChanged(function()
-		TrinketESP.Settings.ValueColor = Options.TrinketValueColor.Value
-		TrinketESP.Settings.ValueAlpha = 1 - Options.TrinketValueColor.Transparency
-		for _, drawings in pairs(TrinketESP.Drawings) do
-			if drawings.Value then
-				drawings.Value.Color = Options.TrinketValueColor.Value
-				drawings.Value.Transparency = Options.TrinketValueColor.Transparency
-			end
-		end
-	end)
-
-	Options.TrinketHighlightFill:OnChanged(function()
-		TrinketESP.Settings.HighlightFillColor = Options.TrinketHighlightFill.Value
-		TrinketESP.Settings.HighlightFillAlpha = 1 - Options.TrinketHighlightFill.Transparency
-		for _, drawings in pairs(TrinketESP.Drawings) do
-			if drawings.Highlight then
-				drawings.Highlight.FillColor = Options.TrinketHighlightFill.Value
-				drawings.Highlight.FillTransparency = Options.TrinketHighlightFill.Transparency
-			end
-		end
-	end)
-
-	Options.TrinketHighlightOutline:OnChanged(function()
-		TrinketESP.Settings.HighlightOutlineColor = Options.TrinketHighlightOutline.Value
-		TrinketESP.Settings.HighlightOutlineAlpha = 1 - Options.TrinketHighlightOutline.Transparency
-		for _, drawings in pairs(TrinketESP.Drawings) do
-			if drawings.Highlight then
-				drawings.Highlight.OutlineColor = Options.TrinketHighlightOutline.Value
-				drawings.Highlight.OutlineTransparency = Options.TrinketHighlightOutline.Transparency
-			end
-		end
-	end)
-
-	-- Keybind callbacks
-	Options.AutoParryKey:OnClick(function()
-		Toggles.AutoParryToggle:SetValue(not Toggles.AutoParryToggle.Value)
-	end)
-
-	Options.PerfectSlideKey:OnClick(function()
-		Toggles.PerfectSlide:SetValue(not Toggles.PerfectSlide.Value)
-	end)
-
-	-- Set up menu keybind
-	Library.ToggleKeybind = Options.MenuKeybind
-
-	-- Watermark setup
-	Library:SetWatermarkVisibility(true)
-	local FrameTimer = tick()
-	local FrameCounter = 0
-	local FPS = 60
-
-	local WatermarkConnection = RunService.RenderStepped:Connect(function()
-		FrameCounter = FrameCounter + 1
-
-		if (tick() - FrameTimer) >= 1 then
-			FPS = FrameCounter
-			FrameTimer = tick()
-			FrameCounter = 0
-		end
-
-		Library:SetWatermark(("MEOW TUAH | %s fps | %s ms"):format(math.floor(FPS), math.floor(GetPing())))
-	end)
-
-	Library:OnUnload(function()
-		WatermarkConnection:Disconnect()
-		CleanupEverything()
-		print("Unloaded!")
-		Library.Unloaded = true
-	end)
-
-	-- The rest of your functions remain exactly the same...
-	-- [All your existing AutoParry, PerfectSlide, TrinketESP, TrinketAutograb functions go here unchanged]
 
 	function AutoParry:SimulateKeyFromKeyEvents(KeyCode)
 		if AutoParry.State.Parrying then
@@ -1205,12 +1235,11 @@ do
 		self._initialized = true
 	end
 
-	-- Initialize everything
 	GetAnimationAllowList()
 	PerfectSlide:Initialise()
 	TrinketShared:Initialise()
 	TrinketESP:Initialise()
 	TrinketAutograb:Initialise()
-
+	UI:KeybindList()
 	getgenv().CG2_SCRIPT_LOADED = true
 end
